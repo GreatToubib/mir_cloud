@@ -4,6 +4,28 @@ import cv2
 from skimage.feature import greycomatrix
 from skimage.feature import local_binary_pattern
 
+from keras.preprocessing.image import load_img
+from keras.preprocessing.image import img_to_array
+from keras.applications.vgg16 import preprocess_input
+from keras.applications.vgg16 import decode_predictions
+from keras.applications import vgg16
+from keras.applications import vgg19
+from keras.applications import resnet50
+from keras.applications import inception_v3
+from keras.applications import mobilenet
+from keras.applications import xception
+from matplotlib.pyplot import imread
+import matplotlib.pyplot as plt
+import operator
+import math
+import os
+import tensorflow as tf
+from keras.models import Model
+
+def cal_MODEL(image, model):
+    feature = model.predict(image)
+    feature = np.array(feature[0])
+    return feature
 
 def histogram_color(image):
     histR = cv2.calcHist([image],[0],None,[256],[0,256])
@@ -13,7 +35,7 @@ def histogram_color(image):
     return hist
 
 
-def cal_Histo2(image):
+def cal_HISTO(image):
   hist_features = []
   if image is not None:
     des = histogram_color(image)
