@@ -5,8 +5,8 @@ import math
 import os
 import json
 from pathlib import Path
-import pickle
 import operator
+from metrics import *
 
 
 def euclidean(l1, l2):
@@ -81,19 +81,18 @@ def compute_distances(descriptorChoice1,descriptorChoice2, des, cal_dist):
     list_distances = []
     i=0
     while i <10000:
-    #for filename in os.listdir(feat_folder+descriptorChoice1+"/"):
-        #if i ==1001: break
         i+=1
-        if i % 2000 ==0: print('computing distance with file number: ', i)
         filename1=feat_folder+descriptorChoice1+"/"+str(math.floor((i-1)/100))+"_"+str(i)+".npy"
+        my_file = Path(filename1)
+        if not my_file.exists():
+            continue
         des_index_image = np.load(filename1)
         if descriptorChoice2 != None:
             filename2 = feat_folder + descriptorChoice2 + "/" + str(math.floor((i - 1) / 100)) + "_" + str(i) + ".npy"
             des_index_image2 = np.load(filename2)
             des_index_image = combiner_des(des_index_image, des_index_image2)
         distance = cal_dist(des,des_index_image)
-        #print(distance)
-        list_distances.append((distance,i))
+        list_distances.append((distance, i))
 
     return list_distances
 
@@ -106,51 +105,68 @@ def get_closest_images(topCB, list_distances):
     return top_images
 
 
-def get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, topCB, filename):
+def get_acc(top_images,file_class,topCB):
+    count=0
+    for index in top_images:
+        if int(math.floor((index-1)/100)) == file_class:
+            count+=1
+    return count/topCB
+
+
+def get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, filename, topCB,features_type):
     results_dict = {}
     results_top_dict = {}
     desc_name = descriptorChoice1
     file_class = int(filename.split("_")[0])
-    filenameTopCB= filename + "_" + str(topCB)
     if descriptorChoice2 != None :
         desc_name = descriptorChoice1+"_"+descriptorChoice2
     my_file = Path("data.json")
     if my_file.exists():
-        print("opening existing data.json")
-        #with open('data.pkl', 'wb') as f:
-         #   results_dict = pickle.load(f)
+        #print("opening existing data.json")
         results_dict = json.load(open("data.json"))
         results_top_dict = json.load(open("data_top_lists.json"))
-        if filenameTopCB not in results_dict:
-            results_dict[filenameTopCB] = {}
-            results_dict[filenameTopCB][desc_name] = {}
-            results_top_dict[filenameTopCB] = {}
-            results_top_dict[filenameTopCB][desc_name] = {}
-        if desc_name not in results_dict[filenameTopCB]:
-            results_dict[filenameTopCB][desc_name] = {}
-            results_top_dict[filenameTopCB][desc_name] = {}
+
+        if filename not in results_dict:
+            results_dict[filename] = {}
+            results_dict[filename][desc_name] = {}
+
+            results_top_dict[filename] = {}
+            results_top_dict[filename][desc_name] = {}
+
+        if desc_name not in results_dict[filename]:
+            results_dict[filename][desc_name] = {}
+            results_top_dict[filename][desc_name] = {}
     else:
-        results_dict[filenameTopCB] = {}
-        results_dict[filenameTopCB][desc_name] = {}
-        results_top_dict[filenameTopCB] = {}
-        results_top_dict[filenameTopCB][desc_name] = {}
+        results_dict[filename] = {}
+        results_dict[filename][desc_name] = {}
+        results_top_dict[filename] = {}
+        results_top_dict[filename][desc_name] = {}
 
     dist_dict={
-        "euclidean": euclidean,
-        "chi2_distance" : chi2_distance,
-        "bhatta" : bhatta
-        #"flann" : flann
-        #"bruteForceMatching" : bruteForceMatching
+        "euclidean": euclidean
+        #"chi2_distance" : chi2_distance,
+        #"bhatta" : bhatta
     }
+    if features_type=="classic":
+        dist_dict = {
+            "euclidean": euclidean
+            #"bhatta": bhatta
+        }
+
+
     for distName, distFunction in dist_dict.items():
-        print(desc_name, "starting to compute distances " + distName)
+
         list_distances = compute_distances(descriptorChoice1, descriptorChoice2, des_of_input_img, distFunction)
-        top_images = get_closest_images(topCB, list_distances)
-        print(top_images)
-        precision = get_acc(top_images, file_class, topCB)
-        print(distName+"_precision: " + str(precision))
-        results_dict[filenameTopCB][desc_name][distName+"_precision"] = precision
-        results_top_dict[filenameTopCB][desc_name][distName] = top_images
+        top_images = get_closest_images(100, list_distances)
+        AP50, AP100, prec_list, rec_list = compute_Precision_Recall_AP(top_images, file_class, topCB)
+        print("== " + distName +" precision: " + str(prec_list[-1]) + " recall: " + str(rec_list[-1])+ " AP50: " + str(AP50)+ " AP100: " + str(AP100))
+        results_dict[filename][desc_name][distName+"_precision50"] = prec_list[49]
+        results_dict[filename][desc_name][distName+"_precision100"] = prec_list[-1]
+        results_dict[filename][desc_name][distName+"_recall50"] = rec_list[49]
+        results_dict[filename][desc_name][distName+"_recall100"] = rec_list[-1]
+        results_dict[filename][desc_name][distName+"_AP50"] = AP50
+        results_dict[filename][desc_name][distName+"_AP100"] = AP100
+        results_top_dict[filename][desc_name][distName] = top_images
 
 
     a_file = open("data.json", "w")
@@ -159,16 +175,5 @@ def get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, topCB, 
     a_file = open("data_top_lists.json", "w")
     json.dump(results_top_dict, a_file)
     a_file.close()
-    print(json.dumps(results_dict, sort_keys=True, indent=4, separators=(',', ': ')))
-    #with open('data.pkl', 'wb') as f:
-    #   pickle.dump(results_dict, f, pickle.HIGHEST_PROTOCOL)
 
     return results_dict
-
-
-def get_acc(top_images,file_class,topCB):
-    count=0
-    for index in top_images:
-        if int(math.floor((index-1)/100)) == file_class:
-            count+=1
-    return count/topCB

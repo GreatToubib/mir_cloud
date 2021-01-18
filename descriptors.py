@@ -40,8 +40,11 @@ def cal_HISTO(image):
   if image is not None:
     des = histogram_color(image)
     hist_features.append(des)
-  hist_featuresA = np.array(hist_features)
-  return hist_featuresA
+    hist_featuresA = np.array(hist_features)
+    return hist_featuresA
+  else:
+    return None
+
 
 
 def siftDescriptor(image):
@@ -63,7 +66,8 @@ def cal_SIFT(image):
     return sift_featuresA
   else :
     print( "des is none")
-    return np.array([0])
+    #return np.array([0])
+    return None
 
 
 def orbDescriptor(image):
@@ -84,7 +88,7 @@ def cal_ORB(image):
     return orb_featuresA
   else :
     print( "des is none")
-    return np.array([0])
+    return None
 
 
 def lbpDescriptor(image):
@@ -92,7 +96,8 @@ def lbpDescriptor(image):
   METHOD = 'uniform'
   radius = 3
   n_points = 8 * radius
-  gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)         # Convertion au niveau de gris
+  img_lbp = cv2.resize(image, (126,126))
+  gray = cv2.cvtColor(img_lbp,cv2.COLOR_BGR2GRAY)         # Convertion au niveau de gris
   lbp = local_binary_pattern(gray, n_points, radius, METHOD)
   return lbp
 
@@ -101,15 +106,20 @@ def cal_LBP(image):
   if image is not None:
     des = lbpDescriptor(image)
     lbp_features = des.tolist()
-  lbp_featuresA = np.array(lbp_features)
-  return lbp_featuresA
+    lbp_featuresA = np.array(lbp_features)
+    return lbp_featuresA
+  else:
+    return None
 
 
 def cal_GLCM(image):
-  image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-  glcm = greycomatrix(image, distances=[1], angles=[0, np.pi / 4, np.pi / 2],
-                      symmetric=True, normed=True)
-  return glcm
+  if image is not None:
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    glcm = greycomatrix(image, distances=[1], angles=[0, np.pi / 4, np.pi / 2],
+                        symmetric=True, normed=True)
+    return glcm
+  else:
+    return None
 
 
 

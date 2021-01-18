@@ -2,14 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9fa0ea39-c499-491a-9682-7913b68768b3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/infos_pratiques/Indexation_DeepLearning_MIR.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infos_pratiques/Projet_UE.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infos_pratiques/Recherche_DeepLearning_MIR.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infos_pratiques/TP4.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/data.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_top_lists.json" beforeDir="false" afterPath="$PROJECT_DIR$/data_top_lists.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/descriptors.py" beforeDir="false" afterPath="$PROJECT_DIR$/descriptors.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/distances.py" beforeDir="false" afterPath="$PROJECT_DIR$/distances.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extract_deep_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_deep_features.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/extract_descriptors.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_descriptors.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -80,7 +79,8 @@
       <workItem from="1609327685188" duration="52000" />
       <workItem from="1609328336980" duration="17000" />
       <workItem from="1610802610986" duration="14446000" />
-      <workItem from="1610844397999" duration="17908000" />
+      <workItem from="1610844397999" duration="20259000" />
+      <workItem from="1610901729252" duration="30634000" />
     </task>
     <servers />
   </component>
@@ -100,6 +100,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/MIR_CLOUD$main.coverage" NAME="main Coverage Results" MODIFIED="1610862689376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MIR_CLOUD$main.coverage" NAME="main Coverage Results" MODIFIED="1610929618647" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

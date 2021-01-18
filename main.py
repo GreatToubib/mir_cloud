@@ -25,11 +25,7 @@ from matplotlib.pyplot import imread
 from descriptors import *
 from distances import *
 
-# numpy.save(file, arr)
-# numpy.load(file)
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-
 
     model_vgg16 = vgg16.VGG16(weights='imagenet', include_top=True, pooling='avg')
     #model_vgg19 = vgg19.VGG19(weights='imagenet', include_top=True, pooling='avg')
@@ -49,46 +45,43 @@ if __name__ == '__main__':
 
     desc_dict = {
         "sift": cal_SIFT, # all good
-        "orb": cal_ORB # all good
-        #"glcm": cal_GLCM, # foire a flann, mais tout foire + ou - a flann
-        #"histo": cal_HISTO, # foire a flann
-        #"lbp": cal_LBP # foire a euclidean
+        "orb": cal_ORB, # all good
+        "glcm": cal_GLCM, # foire a flann, mais tout foire + ou - a flann
+        "histo": cal_HISTO, # foire a flann
+        "lbp": cal_LBP # foire a euclidean
     }
     topCB = 100
-    filename = "14_1475" # 1_112 150 14_1475
-    imagePath = "Corel100_database/"+filename+".jpg"
+    for filename in ["1_112","1_150","1_193", "14_1475","14_1437","14_1430","26_2606", "26_2681", "26_2609", "39_3970", "39_3904","39_3916", "49_4991", "49_4958", "49_4932"]:
+    #for filename in ["1_112"]: # ,"6_650","7_793","2_212","3_350","5_593"
+        imagePath = "Corel100_database/" + filename + ".jpg"
+        print("=================================== filename :  : ", filename)
 
-    descriptorChoice1 = "vgg16"
-    descriptorChoice2 = None
-    desc_name = descriptorChoice1
-    if descriptorChoice2 != None:
-        desc_name = descriptorChoice1 + "_" + descriptorChoice2
-    img = cv2.imread(imagePath)
-    print(" filename : ",filename)
+        for descriptorChoice1 in desc_dict:
+            descriptorChoice2 = None
+            desc_name = descriptorChoice1
+            if descriptorChoice2 != None:
+                desc_name = descriptorChoice1 + "_" + descriptorChoice2
+            img = cv2.imread(imagePath)
+            print( "======= : ", desc_name)
+            des_of_input_img = desc_dict[descriptorChoice1](img)
+            if descriptorChoice2 != None:
+                des2_of_input_img = desc_dict[descriptorChoice2](img)
+                des_of_input_img = combiner_des(des_of_input_img, des2_of_input_img)
+            results_dict = get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img,filename,topCB,features_type="classic")
 
-    print(" desc_name : ", desc_name)
-    image1 = load_img(imagePath, target_size=(224, 224))
-    image1 = img_to_array(image1)
-    image1 = image1.reshape((1, image1.shape[0], image1.shape[1], image1.shape[2]))
+        for descriptorChoice1 in model_dict:
+            descriptorChoice2 = None
+            desc_name = descriptorChoice1
+            if descriptorChoice2 != None:
+                desc_name = descriptorChoice1 + "_" + descriptorChoice2
+            print("=======  : ", desc_name)
+            image1 = load_img(imagePath, target_size=(224, 224))
+            image1 = img_to_array(image1)
+            image1 = image1.reshape((1, image1.shape[0], image1.shape[1], image1.shape[2]))
+            des_of_input_img = cal_MODEL(image1, model_dict[descriptorChoice1])
+            if descriptorChoice2 != None:
+                des2_of_input_img = cal_MODEL(image1, model_dict[descriptorChoice2])
+                des_of_input_img = combiner_des(des_of_input_img, des2_of_input_img)
+            results_dict = get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, filename, topCB, features_type="deep")
 
 
-    if descriptorChoice1 in desc_dict :
-        des_of_input_img = desc_dict[descriptorChoice1](img)
-    else:
-        print("in deepl des")
-        des_of_input_img = cal_MODEL(image1,model_dict[descriptorChoice1])
-
-    if descriptorChoice2 != None:
-        if descriptorChoice2 in desc_dict:
-            des2_of_input_img = desc_dict[descriptorChoice2](img)
-        else:
-            des2_of_input_img = cal_MODEL(image1, model_dict[descriptorChoice2])
-        des_of_input_img = combiner_des(des_of_input_img, des2_of_input_img)
-
-    results_dict = get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, topCB,filename)
-
-    """des_index_image2 = np.load("features/" + descriptorChoice1 + "/" + "14_1475.npy")
-    print(flann(des_of_input_img, des_index_image2))
-    print(euclidean(des_of_input_img, des_index_image2))
-    print(bruteForceMatching(des_of_input_img, des_index_image2))
-"""

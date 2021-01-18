@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
-
 This is a temporary script file.
 """
+
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from keras.applications.vgg16 import preprocess_input
@@ -39,32 +39,55 @@ def cal_model(image, model):
     feature = np.array(feature[0])
     return feature
 
-model_vgg16 = vgg16.VGG16(weights='imagenet', include_top=True,pooling='avg')
-model_resnet50 = resnet50.ResNet50(weights='imagenet', include_top=True,pooling='avg')
-model_mobilenet = mobilenet.MobileNet(weights='imagenet', include_top=True,pooling='avg')
+model_vgg16 = vgg16.VGG16(weights='imagenet', include_top=True, pooling='avg')
+model_vgg19 = vgg19.VGG19(weights='imagenet', include_top=True, pooling='avg')
+model_resnet50 = resnet50.ResNet50(weights='imagenet', include_top=True, pooling='avg')
+model_inception_v3 = inception_v3.InceptionV3(weights='imagenet', include_top=True, pooling='avg')
+model_mobilenet = mobilenet.MobileNet(weights='imagenet', include_top=True, pooling='avg')
+model_xception = xception.Xception(weights='imagenet', include_top=True, pooling='avg')
 
 print("starting main")
-
+if not os.path.isdir("features/vgg19"):
+    os.mkdir("features/vgg19")
+if not os.path.isdir("features/inception_v3"):
+    os.mkdir("features/inception_v3")
+if not os.path.isdir("features/xception "):
+    os.mkdir("features/xception ")
 if not os.path.isdir("features/vgg16"):
     os.mkdir("features/vgg16")
 if not os.path.isdir("features/resnet50"):
     os.mkdir("features/resnet50")
 if not os.path.isdir("features/mobilenet"):
     os.mkdir("features/mobilenet")
-imgFolderPath = "Corel100_database/"
+
+imgFolderPath = "Corel100_database"
 i = 0
 
 for filename in os.listdir(imgFolderPath):
     image1 = load_img(imgFolderPath + "/" + filename, target_size=(224, 224))
-    filename = filename.split(".")[0]
+    filename_no_ext = filename.split(".")[0]
     image1 = img_to_array(image1)
     image1 = image1.reshape((1, image1.shape[0], image1.shape[1], image1.shape[2]))
-    mvgg16 = cal_model(image1, model_vgg16)
+    """mvgg16 = cal_model(image1, model_vgg16)
     np.save("features/vgg16/"+filename, mvgg16)
     mresnet50 = cal_model(image1, model_resnet50)
     np.save("features/resnet50/" + filename, mresnet50)
     mmobilenet = cal_model(image1, model_mobilenet)
-    np.save("features/mobilenet/" + filename, mmobilenet)
+    np.save("features/mobilenet/" + filename, mmobilenet)"""
+    mvgg19 = cal_model(image1, model_vgg19)
+    np.save("features/vgg19/" + filename_no_ext, mvgg19)
+
+    image1 = load_img(imgFolderPath + "/" + filename, target_size=(299, 299))
+    filename = filename.split(".")[0]
+    image1 = img_to_array(image1)
+    image1 = image1.reshape((1, image1.shape[0], image1.shape[1], image1.shape[2]))
+
+    minception_v3 = cal_model(image1, model_inception_v3)
+    np.save("features/inception_v3/" + filename_no_ext, minception_v3)
+
+
+    mxception = cal_model(image1, model_xception)
+    np.save("features/xception/" + filename_no_ext, mxception)
 
 print("")
 print("done")
