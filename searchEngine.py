@@ -24,16 +24,13 @@ from matplotlib.pyplot import imread
 
 from descriptors import *
 from distances import *
+from metrics import *
 
-if file_class == None:
-    int(math.floor((top_images[j] - 1) / 100))
+def guess_file_class(filename, best_model,best_model2):
 
-def guess_file_class(filename):
-    best_model = vgg19.VGG19(weights='imagenet', include_top=True, pooling='avg')
-    best_model2 = vgg16.VGG16(weights='imagenet', include_top=True, pooling='avg')
-    best_model3 = resnet50.ResNet50(weights='imagenet', include_top=True, pooling='avg')
     topCB = 100
-    imagePath = "uploaded_images/" + filename
+    #imagePath = "uploaded_images/" + filename
+    imagePath = "uploads/" + filename
     distFunction = chi2_distance
 
     image1 = load_img(imagePath, target_size=(224, 224))
@@ -48,13 +45,14 @@ def guess_file_class(filename):
     top_images = get_closest_images(100, list_distances)
     top_classes=[]
     for index in top_images:
-        top_classes.append(int(math.floor((top_images[index]-1) / 100)))
+        top_classes.append(int(math.floor((index-1) / 100)))
     file_class = max(set(top_classes), key=top_classes.count)
     return file_class
 
 
 def get_search_results(descriptorChoice1,descriptorChoice2,distName,filename,file_class):
-
+    print(filename)
+    print("loading models")
     model_vgg16 = vgg16.VGG16(weights='imagenet', include_top=True, pooling='avg')
     model_vgg19 = vgg19.VGG19(weights='imagenet', include_top=True, pooling='avg')
     model_resnet50 = resnet50.ResNet50(weights='imagenet', include_top=True, pooling='avg')
@@ -65,8 +63,8 @@ def get_search_results(descriptorChoice1,descriptorChoice2,distName,filename,fil
         "inception_v3": model_inception_v3,
         "resnet50": model_resnet50,
         "vgg19": model_vgg19,
-        "vgg16": model_vgg16
-        "xception": model_xception,
+        "vgg16": model_vgg16,
+        "xception": model_xception
     }
     dist_dict={
             "euclidean": euclidean,
@@ -75,9 +73,12 @@ def get_search_results(descriptorChoice1,descriptorChoice2,distName,filename,fil
         }
 
     topCB = 100
-    imagePath = "uploaded_images/" + filename
+    imagePath = "uploads/" + filename
     distFunction = dist_dict[distName]
-
+    if file_class == None:
+        print("gonna guess class")
+        file_class = guess_file_class(filename, model_vgg16, model_resnet50)
+        print("guessed class = ", file_class)
 
     # extraire les features de l'image en input
     if descriptorChoice2 == 0:
@@ -94,7 +95,7 @@ def get_search_results(descriptorChoice1,descriptorChoice2,distName,filename,fil
         des2_of_input_img = cal_MODEL(image1, model_dict[descriptorChoice2])
         des_of_input_img = combiner_des(des_of_input_img, des2_of_input_img)
 
-
+    print("gonna get results")
     list_distances = compute_distances(descriptorChoice1, descriptorChoice2, des_of_input_img, distFunction)
     top_images = get_closest_images(100, list_distances)
 
@@ -102,11 +103,15 @@ def get_search_results(descriptorChoice1,descriptorChoice2,distName,filename,fil
     print("== " + distName + " precision: " + str(prec_list[-1]) + " recall: " + str(rec_list[-1]) + " AP50: " + str(
         AP50) + " AP100: " + str(AP100))
 
-    P50 = prec_list[49]
-    P100 = prec_list[-1]
-    R50 = rec_list[49]
-    R100 = rec_list[-1]
+
 
     return AP50, AP100, prec_list, rec_list, top_images
 
+ # 0_8 1_173 3_323 4_443 6_638  23_2328  40_4098 54_5498 76_7628
+AP50, AP100, prec_list, rec_list, top_images = get_search_results("resnet50",None,"euclidean","54_5498.jpg",None)
+print(top_images[0:20])
+P50 = prec_list[49]
+P100 = prec_list[-1]
+R50 = rec_list[49]
+R100 = rec_list[-1]
 
