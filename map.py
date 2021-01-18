@@ -1,12 +1,18 @@
 import json
 map_dict={}
-results_folder= "results_euclid_8basic"
+results_folder= "results" # results_euclid_11basic
 results_dict = json.load(open(results_folder+"/data.json"))
 distName="euclidean"
-for desc_name in ["mobilenet","resnet50","vgg16","sift","orb","glcm","histo","lbp" ] :
-    map_dict[desc_name]={}
-    for distName in ["euclidean"]:
-        map_value50=0
+for desc_name in results_dict["49_4958"]:
+    map_dict[desc_name] = {}
+    distList=[]
+    for key in results_dict["49_4958"][desc_name]:
+        distance_name = key.split("_")[0]
+        if key.split("_")[0] == "chi2":  distance_name = key.split("_")[0]+"_"+ key.split("_")[1]
+        if distance_name not in distList:
+            distList.append(distance_name)
+    for distName in distList:
+        map_value50 = 0
         map_value100 = 0
         map_dict[desc_name][distName]={}
         for filename in ["1_112", "1_150", "1_193", "14_1475", "14_1437", "14_1430", "26_2606", "26_2681", "26_2609", "39_3970",

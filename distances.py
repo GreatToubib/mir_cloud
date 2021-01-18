@@ -143,13 +143,13 @@ def get_all_tops(descriptorChoice1, descriptorChoice2, des_of_input_img, filenam
         results_top_dict[filename][desc_name] = {}
 
     dist_dict={
-        "euclidean": euclidean
-        #"chi2_distance" : chi2_distance,
+        #"euclidean": euclidean,
+        "chi2_distance" : chi2_distance,
         #"bhatta" : bhatta
     }
     if features_type=="classic":
         dist_dict = {
-            "euclidean": euclidean
+            #"euclidean": euclidean,
             #"bhatta": bhatta
         }
 
